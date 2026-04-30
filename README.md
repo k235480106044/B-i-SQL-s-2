@@ -200,10 +200,15 @@ Chú thích: Hình ảnh mô tả quá tự động tính toán và cập nhật
 <img width="2559" height="1599" alt="Ảnh chụp màn hình 2026-04-30 111615" src="https://github.com/user-attachments/assets/7a4331ff-054f-4bfd-af0f-9c02b7414958" />
 <img width="2559" height="1599" alt="Ảnh chụp màn hình 2026-04-30 111636" src="https://github.com/user-attachments/assets/4b9ae5d2-81d7-4c33-9e57-c0e333b2a25c" />
 Nhận xét
+
 - Cursor:
+  
 Duyệt từng dòng → chậm
+
 Tốn tài nguyên
+
 - Không dùng Cursor:
+  
 Xử lý toàn bộ bảng → nhanh hơn nhiều
 
 
