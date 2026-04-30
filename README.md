@@ -60,7 +60,8 @@ Tìm cách không sử dụng CURSOR để giải quyết bài toán mà em đã
 
 Nếu vẫn tìm được cách dùng SQL để giải quyết vấn đề mà ko cần CURSOR: thử nghĩ bài toán khác, mà chỉ CURSOR mới giải quyết được, còn SQL rất khó giải quyết đc (theo logic suy nghĩ của em)
 
-
+   BÀI LÀM
+   
 Phần 1: Thiết kế và Khởi tạo Cấu trúc Dữ liệu
 
 <img width="2519" height="1599" alt="Ảnh chụp màn hình 2026-04-30 090130" src="https://github.com/user-attachments/assets/9ffe9818-17cc-427c-b50a-50625763bb9f" />
