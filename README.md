@@ -60,6 +60,7 @@ Tìm cách không sử dụng CURSOR để giải quyết bài toán mà em đã
 
 Nếu vẫn tìm được cách dùng SQL để giải quyết vấn đề mà ko cần CURSOR: thử nghĩ bài toán khác, mà chỉ CURSOR mới giải quyết được, còn SQL rất khó giải quyết đc (theo logic suy nghĩ của em)
 
+
 Phần 1: Thiết kế và Khởi tạo Cấu trúc Dữ liệu
 
 <img width="2519" height="1599" alt="Ảnh chụp màn hình 2026-04-30 090130" src="https://github.com/user-attachments/assets/9ffe9818-17cc-427c-b50a-50625763bb9f" />
@@ -110,12 +111,15 @@ Multi-statement Table-Valued Function (Hàm bảng đa câu lệnh): Trả về 
 
 Dù hệ thống có nhiều hàm, nhưng nó không thể biết logic riêng của từng doanh nghiệp. Ví dụ: SQL có hàm cộng trừ, nhưng không có hàm "Tính mức chiết khấu cho khách hàng VIP vào ngày sinh nhật". Đó là lúc cần UDF.
 
+3. Viết 01 Scalar Function
 <img width="2559" height="1599" alt="Ảnh chụp màn hình 2026-04-30 090736" src="https://github.com/user-attachments/assets/7d350d9a-6737-4633-9d50-a28ca738e8c9" />
 Chú thích: Tạo hàm fn_TinhThanhTienSauVAT để tính tiền cho một dòng sản phẩm (Số lượng * Giá * 1.1). Đây là hàm trả về một giá trị đơn.
 
+4. Viết 01 Inline Table-Valued Function
 <img width="1280" height="800" alt="Ảnh chụp màn hình 2026-04-30 090839" src="https://github.com/user-attachments/assets/298f5ad7-23c2-44e1-881d-78bb15d7d060" />
-Chú thích: Tạo hàm fn_HoaDonTheoNhanVien để trả về một bảng danh sách các hóa đơn do một nhân viên cụ thể phụ trách.
+Chú thích: Tạo hàm fn_HoaDonTheoNhanVien để trả về một bảng danh sách các hóa đơn.
 
+5. Viết 01 Multi-statement Table-Valued Function
 <img width="2559" height="1599" alt="Ảnh chụp màn hình 2026-04-30 090940" src="https://github.com/user-attachments/assets/7dde3ead-3e57-4a28-8082-dd041e3320e4" />
 Chú thích: Tạo hàm fn_DanhSachHoaDonDayDu xử lý logic phức tạp hơn (sử dụng biến bảng @KetQua) để gộp dữ liệu từ nhiều bảng và tính toán thuế VAT trước khi trả về kết quả cuối cùng.
 
@@ -135,21 +139,77 @@ sp_rename: Dùng để đổi tên một đối tượng (bảng hoặc cột) m
 
 Cách dùng: EXEC sp_rename 'TenCu', 'TenMoi';
 
+1. Viết 01 Store Procedure đơn giản để thực hiện lệnh INSERT hoặc UPDATE dữ liệu
 <img width="1280" height="800" alt="Ảnh chụp màn hình 2026-04-30 091214" src="https://github.com/user-attachments/assets/1b10c632-cef9-4075-b3ba-c7959e95ed01" />
 Chú thích: Tạo thủ tục sp_ThenHoaDon để bán hàng. Thủ tục này có logic kiểm tra: Nếu số lượng mua lớn hơn số lượng tồn trong kho thì báo lỗi, ngược lại thì tiến hành trừ kho và thêm hóa đơn.
 
+2. Viết 01 Store Procedure có sử dụng tham số OUTPUT
 <img width="2559" height="1599" alt="Ảnh chụp màn hình 2026-04-30 091448" src="https://github.com/user-attachments/assets/9a82f4cf-07ca-46d5-86e5-5f3addaa604b" />
 Chú thích: Tạo thủ tục sp_TinhTongTienHoaDon sử dụng biến @TongTien MONEY OUTPUT để tính và trả về giá trị tổng tiền của một hóa đơn cụ thể cho chương trình gọi nó.
 
+3. Viết 01 Store Procedure trả về một tập kết quả
 <img width="2559" height="1599" alt="Ảnh chụp màn hình 2026-04-30 091630" src="https://github.com/user-attachments/assets/50bc9191-8841-472d-8b1d-e5f3dd0499b3" />
 Chú thích: Tạo thủ tục sp_DanhSachHoaDon thực hiện JOIN 3 bảng (HoaDon, NhanVien, SanPham) để xuất ra báo cáo chi tiết: Tên nhân viên nào đã bán sản phẩm gì, số lượng bao nhiêu.
 
 Phần 4: Trigger và Xử lý logic nghiệp vụ (Kiến thức 11)
 
+1. Viết 01 Trigger để tự động
 <img width="2559" height="1599" alt="Ảnh chụp màn hình 2026-04-30 100412" src="https://github.com/user-attachments/assets/8bcae63b-e6e7-4ec3-8033-514c24a501b8" />
 Chú thích: Kiểm tra lại bảng [SanPham], [HoaDon]
 
 <img width="2559" height="1599" alt="Ảnh chụp màn hình 2026-04-30 095716" src="https://github.com/user-attachments/assets/67562601-200d-4559-9ab6-528e0e65702e" />
+Chú thích: tạo Trigger trg_GiamSoLuongTon với việc ngay sau khi thêm một dòng dữ liệu mới được thêm vào bảng hóa đơn, nó sẽ tự động cập nhật bảng SanPham. Số lượng tồn sẽ bị trừ đi đúng bằng số lượng sản phẩm vừa bán trong hóa đơn đó.
+
+2. Viết 1 Trigger tạo vòng lặp và nhận xét
+<img width="2559" height="1599" alt="Ảnh chụp màn hình 2026-04-30 100136" src="https://github.com/user-attachments/assets/64db5dae-a698-43b6-b4ee-b56defb63e4c" />
+<img width="2559" height="1599" alt="Ảnh chụp màn hình 2026-04-30 100412" src="https://github.com/user-attachments/assets/051043f3-d9ca-47d7-a0ff-91e8b5d64ee8" />
+Nhận xét: Khi thiết kế Trigger giữa hai bảng có quan hệ qua lại (A cập nhật B và B lại cập nhật A), có thể xảy ra hiện tượng vòng lặp vô hạn (recursive trigger). SQL Server sẽ tự động dừng sau một số lần lặp lại
+
+Insert vào [HoaDon]
+
+→ Trigger A chạy → UPDATE [SanPham]
+
+UPDATE [SanPham]
+
+→ Trigger B chạy → UPDATE [HoaDon]
+
+UPDATE [HoaDon]
+
+→ Trigger A lại chạy tiếp
+
+Phần 5: Cursor và Duyệt dữ liệu
+
+- Cập nhật giá bán sau khuyến mãi theo từng sản phẩm:
+
+Nếu GiaNiemYet > 30 triệu → giảm 10%
+
+Nếu GiaNiemYet từ 20–30 triệu → giảm 5%
+
+Ngược lại → không giảm
+
+- Lưu vào cột mới: [GiaSauGiam]
+
+1. Sử dụng CURSOR để giải quyết bài toán:
+  
+<img width="2558" height="1597" alt="Ảnh chụp màn hình 2026-04-30 100952" src="https://github.com/user-attachments/assets/7a089112-5a68-4616-a558-8139e259351a" />
+<img width="2559" height="1599" alt="Ảnh chụp màn hình 2026-04-30 101748" src="https://github.com/user-attachments/assets/e1dbd6c1-fe83-46c8-a49e-c39f707e74c1" />
+Chú thích: Hình ảnh mô tả quá tự động tính toán và cập nhật giá bán mới cho các sản phẩm dựa trên các mức giảm giá khác nhau. Hệ thống dùng vòng lặp để đi qua từng sản phẩm một và kiểm tra điều kiện: Nếu giá trên 30 triệu giảm 10% (Giá mới = Giá gốc * 0.9). Nếu giá từ 20 đến 30 giảm 5% (Giá mới = Giá gốc * 0.95). Nếu dưới 20 triệu giữ nguyên giá.
+
+2. Giải quyết không dùng CURSOR và So sánh:
+<img width="2559" height="1599" alt="Ảnh chụp màn hình 2026-04-30 111615" src="https://github.com/user-attachments/assets/7a4331ff-054f-4bfd-af0f-9c02b7414958" />
+<img width="2559" height="1599" alt="Ảnh chụp màn hình 2026-04-30 111636" src="https://github.com/user-attachments/assets/4b9ae5d2-81d7-4c33-9e57-c0e333b2a25c" />
+Nhận xét
+- Cursor:
+Duyệt từng dòng → chậm
+Tốn tài nguyên
+- Không dùng Cursor:
+Xử lý toàn bộ bảng → nhanh hơn nhiều
+
+
+
+
+
+
 
 
 
